@@ -1,86 +1,122 @@
-import { tmdbURL, tmdbAPIKey, streamingAPIURL, streamingAPIKey } from '../config/apiConfig.js';
+import { getMovieRecommendations, getStreamingProviders } from '../api/movieRecomendations.js';
+import { getUserLocation } from '../utils/utils.js';
 
+
+const userCountry = await getUserLocation();
 
 
 const searchForm = document.querySelector('form');
 searchForm.addEventListener('submit', handleFormSubmit);
 
-
 function handleFormSubmit(event) {
   event.preventDefault();
   const searchTerm = document.querySelector('#search-movie').value;
-  getMovieRecommendations(searchTerm);
+  getMovieRecommendations(searchTerm)
+    .then((recommendations) => showRecommendations(recommendations));
 }
 
 
-async function getMovieRecommendations(movieTitle) {
-  const searchUrl = `${tmdbURL}search/movie?api_key=${tmdbAPIKey}&query=${movieTitle}`;
-  const response = await fetch(searchUrl);
-  const data = await response.json();
-  const movieId = data.results[0].id; // Get the first movie result
-  const recommendUrl = `${tmdbURL}movie/${movieId}/recommendations?api_key=${tmdbAPIKey}`;
-  const recommendResponse = await fetch(recommendUrl);
-  const recommendData = await recommendResponse.json();
-  showRecommendations(recommendData.results, movieId);
-}
+async function showRecommendations(recommendations) {
+  const resultsContainer = createResultsContainer();
 
 
-async function getStreamingLogos(movieId) {
-  const streamingUrl = `${tmdbURL}movie/${movieId}/watch/providers?api_key=${tmdbAPIKey}`;
-  const response = await fetch(streamingUrl);
-  const data = await response.json();
-  const providers = data.results;
-  const logoUrls = providers['IT'] ? providers['IT'].flatrate.map(provider => provider.logo_path) : [];
-  return logoUrls;
-}
+  for (const movie of recommendations) {
+    const movieContainer = createMovieContainer();
 
 
-async function showRecommendations(recommendations, movieId) {
-  const resultsContainer = document.createElement('div');
-  resultsContainer.classList.add('results-container');
- 
-  for (let i = 0; i < 5 && i < recommendations.length; i++) {
-    const movie = recommendations[i];
-    const movieContainer = document.createElement('div');
-    movieContainer.classList.add('movie-container');
-   
-    const moviePoster = document.createElement('img');
-    moviePoster.src = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
-    moviePoster.alt = `${movie.title} Poster`;
-    moviePoster.classList.add('movie-poster');
+    const moviePoster = createMoviePoster(movie);
     movieContainer.appendChild(moviePoster);
-   
-    const movieDetails = document.createElement('div');
-    movieDetails.classList.add('movie-details');
-   
-    const movieTitle = document.createElement('h2');
-    movieTitle.textContent = movie.title;
-    movieTitle.classList.add('movie-title');
+
+
+    const movieDetails = createMovieDetails();
+
+
+    const movieTitle = createMovieTitle(movie);
     movieDetails.appendChild(movieTitle);
-   
-    const movieRating = document.createElement('p');
-    movieRating.textContent = `Rating: ${movie.vote_average}`;
-    movieRating.classList.add('movie-rating');
+
+
+    const movieRating = createMovieRating(movie);
     movieDetails.appendChild(movieRating);
-   
-    const whereToWatch = document.createElement('div');
-    whereToWatch.classList.add('where-to-watch');
-    const logoUrls = await getStreamingLogos(movieId);
-    logoUrls.forEach(url => {
-      const logo = document.createElement('img');
-      logo.src = `https://image.tmdb.org/t/p/w92/${url}`;
-      logo.alt = 'Streaming Logo';
-      whereToWatch.appendChild(logo);
-    });
+
+
+    const whereToWatch = await createWheretoWatch(movie);
     movieDetails.appendChild(whereToWatch);
-   
+
+
+    const movieDescription = createMovieDescription(movie);
+    movieDetails.appendChild(movieDescription);
+
+
     movieContainer.appendChild(movieDetails);
     resultsContainer.appendChild(movieContainer);
   }
- 
+
+
   const main = document.querySelector('main');
   main.appendChild(resultsContainer);
 }
 
 
 
+
+ 
+  function createResultsContainer() {
+    const resultsContainer = document.createElement('div');
+    resultsContainer.classList.add('results-container');
+    return resultsContainer;
+  }
+ 
+  function createMovieContainer() {
+    const movieContainer = document.createElement('div');
+    movieContainer.classList.add('movie-container');
+    return movieContainer;
+  }
+ 
+  function createMoviePoster(movie) {
+    const moviePoster = document.createElement('img');
+    moviePoster.src = `https://image.tmdb.org/t/p/w500/${movie.poster_path}`;
+    moviePoster.alt = `${movie.title} Poster`;
+    moviePoster.classList.add('movie-poster');
+    return moviePoster;
+  }
+ 
+  function createMovieDetails() {
+    const movieDetails = document.createElement('div');
+    movieDetails.classList.add('movie-details');
+    return movieDetails;
+  }
+ 
+  function createMovieTitle(movie) {
+    const movieTitle = document.createElement('h2');
+    movieTitle.textContent = movie.title;
+    movieTitle.classList.add('movie-title');
+    return movieTitle;
+  }
+ 
+  function createMovieRating(movie) {
+    const movieRating = document.createElement('p');
+    movieRating.textContent = `Rating: ${movie.vote_average.toFixed(1)}`;
+    movieRating.classList.add('movie-rating');
+    return movieRating;
+  }
+ 
+  function createMovieDescription(movie) {
+    const movieDescription = document.createElement('p');
+    movieDescription.textContent = movie.overview;
+    movieDescription.classList.add('movie-description');
+    return movieDescription;
+  }
+ 
+  async function createWheretoWatch(movie) {
+    const providers = await getStreamingProviders(movie.id, userCountry.toUpperCase());
+    const container = document.createElement('div');
+    container.classList.add('wheretowatch-container');
+    for (const provider of providers) {
+      const logo = document.createElement('img');
+      logo.src = `https://image.tmdb.org/t/p/original${provider.logo_path}`;
+      logo.alt = `${provider.provider_name} Logo`;
+      logo.classList.add('wheretowatch-logo');
+      container.appendChild(logo);
+    }
+    return container;
+  }

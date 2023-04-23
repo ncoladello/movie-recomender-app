@@ -1,37 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
-    <link rel="stylesheet" href="./css/style.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap" rel="stylesheet">
-    <title>Movie Recommender</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Movie Recommender</title>
+  <link rel="stylesheet" href="./css/style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  
+
+
 </head>
 <body>
-    <header>
-        <nav>
-
-        </nav>
-    </header>
-    <main>
-        <h1>Movie Recommender</h1>
-        
-        <form action="" method="get">
-            <label for="search-movie"></label>
-            <input type="text" name="search-movie" id="search-movie" placeholder="Search a Movie Recomendation...">
-            <button type="submit" id="search-btn">
-                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="#000000" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                    <circle cx="10" cy="10" r="7" />
-                    <line x1="21" y1="21" x2="15" y2="15" />
-                </svg>
-            </button>
-        </form>
-    </main>
-    <script type="module" src="./src/app/app.js"></script>
+  <header>
+      
+          <h1>Movie Recommender</h1>
+          
+    
+    <form id="search-form">
+        <input type="text" id="search-movie" placeholder="Type a movie title...">
+        <button type="submit" id="search-btn">
+            <i class="fas fa-search"></i>
+          </button>
+          
+      </form>
+  </header>
+  <main>
+   
+      
+    <div class="results-container">
+      <!-- Results will be dynamically generated here -->
+    </div>
+  </main>
+  <footer>
+    <p>&copy; 2023 Movie Recommender</p>
+  </footer>
+  <script type="module" src="./src/app/app.js"></script>
 </body>
 </html>
