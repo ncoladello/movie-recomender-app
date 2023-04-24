@@ -74,6 +74,8 @@ main {
     color: white;
     transform: translateY(100%);
     transition: all 0.3s ease;
+    text-align: justify;
+
   }
   
   .movie-container:hover .movie-details {
